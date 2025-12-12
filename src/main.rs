@@ -1,5 +1,3 @@
-use std::u16;
-
 use clap::{Parser, Subcommand};
 use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
@@ -16,7 +14,6 @@ enum Commands {
     Get {
         key: String,
     },
-
     Set {
         key: String,
         value: String,
@@ -25,6 +22,15 @@ enum Commands {
         key: String,
         seconds: u64,
         value: String,
+    },
+    Del {
+        key: String,
+    },
+    Incr {
+        key: String,
+    },
+    Decr {
+        key: String,
     },
 }
 
@@ -78,6 +84,9 @@ async fn main() -> io::Result<()> {
             seconds,
             value,
         } => format!("SETEX {key} {seconds} {value}"),
+        Commands::Del { key } => format!("DEL {key}"),
+        Commands::Incr { key } => format!("INCR {key}"),
+        Commands::Decr { key } => format!("DECR {key}"),
     };
     if let Some(response) = write_to_redis(client, message.as_bytes()).await.ok() {
         println!("{}", response);
