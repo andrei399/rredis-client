@@ -26,6 +26,7 @@ enum Commands {
     Del {
         key: String,
     },
+    Exists { key: String },
     Incr {
         key: String,
     },
@@ -85,6 +86,7 @@ async fn main() -> io::Result<()> {
             value,
         } => format!("SETEX {key} {seconds} {value}"),
         Commands::Del { key } => format!("DEL {key}"),
+        Commands::Exists { key } => format!("EXISTS {key}"),
         Commands::Incr { key } => format!("INCR {key}"),
         Commands::Decr { key } => format!("DECR {key}"),
     };
