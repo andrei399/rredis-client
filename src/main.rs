@@ -26,13 +26,21 @@ enum Commands {
     Del {
         key: String,
     },
-    Exists { key: String },
+    Exists {
+        key: String,
+    },
     Incr {
         key: String,
     },
     Decr {
         key: String,
     },
+    Mget {
+        keys: Vec<String>,
+    },
+    Mset {
+        key_value_pairs: Vec<String>,
+    }
 }
 
 async fn write_to_redis(mut client: TcpStream, message: &[u8]) -> io::Result<String> {
@@ -89,6 +97,14 @@ async fn main() -> io::Result<()> {
         Commands::Exists { key } => format!("EXISTS {key}"),
         Commands::Incr { key } => format!("INCR {key}"),
         Commands::Decr { key } => format!("DECR {key}"),
+        Commands::Mget { keys } => {
+            let formatted_keys = keys.join(" ");
+            format!("MGET {formatted_keys}")
+        },
+        Commands::Mset { key_value_pairs } => {
+            let formatted_keys = key_value_pairs.join(" ");
+            format!("MSET {formatted_keys}")
+        }
     };
     if let Some(response) = write_to_redis(client, message.as_bytes()).await.ok() {
         println!("{}", response);
