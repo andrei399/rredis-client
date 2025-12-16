@@ -57,6 +57,12 @@ enum Commands {
         key: String,
         value: String,
     },
+    Lpop {
+        key: String,
+    },
+    Rpop {
+        key: String,
+    },
 }
 
 async fn write_to_redis(mut client: TcpStream, message: &[u8]) -> io::Result<String> {
@@ -125,6 +131,8 @@ async fn main() -> io::Result<()> {
         Commands::Append { key, value } => format!("APPEND {key} {value}"),
         Commands::Lpush { key, value } => format!("LPUSH {key} {value}"),
         Commands::Rpush { key, value } => format!("RPUSH {key} {value}"),
+        Commands::Lpop { key } => format!("LPOP {key}"),
+        Commands::Rpop { key } => format!("RPOP {key}"),
     };
     if let Some(response) = write_to_redis(client, message.as_bytes()).await.ok() {
         println!("{}", response);
