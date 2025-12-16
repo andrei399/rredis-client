@@ -18,6 +18,10 @@ enum Commands {
         key: String,
         value: String,
     },
+    Getset {
+        key: String,
+        value: String,
+    },
     Setex {
         key: String,
         seconds: u64,
@@ -40,6 +44,10 @@ enum Commands {
     },
     Mset {
         key_value_pairs: Vec<String>,
+    },
+    Append {
+        key: String,
+        value: String
     },
     Lpush {
         key: String,
@@ -95,6 +103,7 @@ async fn main() -> io::Result<()> {
 
     let message = match cli.command {
         Commands::Get { key } => format!("GET {key}"),
+        Commands::Getset { key, value } => format!("GETSET {key} {value}"),
         Commands::Set { key, value } => format!("SET {key} {value}"),
         Commands::Setex {
             key,
@@ -112,7 +121,8 @@ async fn main() -> io::Result<()> {
         Commands::Mset { key_value_pairs } => {
             let formatted_keys = key_value_pairs.join(" ");
             format!("MSET {formatted_keys}")
-        }
+        },
+        Commands::Append { key, value } => format!("APPEND {key} {value}"),
         Commands::Lpush { key, value } => format!("LPUSH {key} {value}"),
         Commands::Rpush { key, value } => format!("RPUSH {key} {value}"),
     };
