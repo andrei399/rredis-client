@@ -47,7 +47,7 @@ enum Commands {
     },
     Append {
         key: String,
-        value: String
+        value: String,
     },
     Lpush {
         key: String,
@@ -70,7 +70,11 @@ enum Commands {
         key: String,
         start: usize,
         stop: usize,
-    }
+    },
+    Sadd {
+        key: String,
+        values: Vec<String>,
+    },
 }
 
 async fn write_to_redis(mut client: TcpStream, message: &[u8]) -> io::Result<String> {
@@ -135,7 +139,7 @@ async fn main() -> io::Result<()> {
         Commands::Mset { key_value_pairs } => {
             let formatted_keys = key_value_pairs.join(" ");
             format!("MSET {formatted_keys}")
-        },
+        }
         Commands::Append { key, value } => format!("APPEND {key} {value}"),
         Commands::Lpush { key, value } => format!("LPUSH {key} {value}"),
         Commands::Rpush { key, value } => format!("RPUSH {key} {value}"),
@@ -143,6 +147,10 @@ async fn main() -> io::Result<()> {
         Commands::Rpop { key } => format!("RPOP {key}"),
         Commands::Llen { key } => format!("LLEN {key}"),
         Commands::Lrange { key, start, stop } => format!("LRANGE {key} {start} {stop}"),
+        Commands::Sadd { key, values } => {
+            let formatted_values = values.join(" ");
+            format!("SADD {key} {formatted_values}")
+        }
     };
     if let Some(response) = write_to_redis(client, message.as_bytes()).await.ok() {
         println!("{}", response);
