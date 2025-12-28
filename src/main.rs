@@ -85,6 +85,10 @@ enum Commands {
     Sismember {
         key: String,
         value: String,
+    },
+    Hset {
+        key: String,
+        key_value_pairs: Vec<String>,
     }
 }
 
@@ -168,6 +172,10 @@ async fn main() -> io::Result<()> {
         }
         Commands::Smembers { key } => format!("SMEMBERS {key}"),
         Commands::Sismember { key, value } => format!("SISMEMBER {key} {value}"),
+        Commands::Hset { key, key_value_pairs } => {
+            let formatted_pairs = key_value_pairs.join(" ");
+            format!("HSET {key} {formatted_pairs}")
+        }
     };
     if let Some(response) = write_to_redis(client, message.as_bytes()).await.ok() {
         println!("{}", response);
