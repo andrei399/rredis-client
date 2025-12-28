@@ -96,7 +96,11 @@ enum Commands {
     },
     Hgetall {
         key: String,
-    }
+    },
+    Hdel {
+        key: String,
+        fields: Vec<String>,
+    },
 }
 
 async fn write_to_redis(mut client: TcpStream, message: &[u8]) -> io::Result<String> {
@@ -179,12 +183,16 @@ async fn main() -> io::Result<()> {
         }
         Commands::Smembers { key } => format!("SMEMBERS {key}"),
         Commands::Sismember { key, value } => format!("SISMEMBER {key} {value}"),
-        Commands::Hset { key, key_value_pairs } => {
+        Commands::Hset {
+            key,
+            key_value_pairs,
+        } => {
             let formatted_pairs = key_value_pairs.join(" ");
             format!("HSET {key} {formatted_pairs}")
         }
         Commands::Hget { key, field } => format!("HGET {key} {field}"),
         Commands::Hgetall { key } => format!("HGETALL {key}"),
+        Commands::Hdel { key, fields } => format!("HDEL {} {}", key, fields.join(" ")),
     };
     if let Some(response) = write_to_redis(client, message.as_bytes()).await.ok() {
         println!("{}", response);
