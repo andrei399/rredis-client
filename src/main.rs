@@ -75,6 +75,13 @@ enum Commands {
         key: String,
         values: Vec<String>,
     },
+    Srem {
+        key: String,
+        values: Vec<String>,
+    },
+    Smembers {
+        key: String,
+    },
 }
 
 async fn write_to_redis(mut client: TcpStream, message: &[u8]) -> io::Result<String> {
@@ -151,6 +158,11 @@ async fn main() -> io::Result<()> {
             let formatted_values = values.join(" ");
             format!("SADD {key} {formatted_values}")
         }
+        Commands::Srem { key, values } => {
+            let formatted_values = values.join(" ");
+            format!("SREM {key} {formatted_values}")
+        }
+        Commands::Smembers { key } => format!("SMEMBERS {key}"),
     };
     if let Some(response) = write_to_redis(client, message.as_bytes()).await.ok() {
         println!("{}", response);
