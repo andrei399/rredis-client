@@ -89,6 +89,13 @@ enum Commands {
     Hset {
         key: String,
         key_value_pairs: Vec<String>,
+    },
+    Hget {
+        key: String,
+        field: String,
+    },
+    Hgetall {
+        key: String,
     }
 }
 
@@ -176,6 +183,8 @@ async fn main() -> io::Result<()> {
             let formatted_pairs = key_value_pairs.join(" ");
             format!("HSET {key} {formatted_pairs}")
         }
+        Commands::Hget { key, field } => format!("HGET {key} {field}"),
+        Commands::Hgetall { key } => format!("HGETALL {key}"),
     };
     if let Some(response) = write_to_redis(client, message.as_bytes()).await.ok() {
         println!("{}", response);
