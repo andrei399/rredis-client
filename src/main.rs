@@ -82,6 +82,10 @@ enum Commands {
     Smembers {
         key: String,
     },
+    Sismember {
+        key: String,
+        value: String,
+    }
 }
 
 async fn write_to_redis(mut client: TcpStream, message: &[u8]) -> io::Result<String> {
@@ -163,6 +167,7 @@ async fn main() -> io::Result<()> {
             format!("SREM {key} {formatted_values}")
         }
         Commands::Smembers { key } => format!("SMEMBERS {key}"),
+        Commands::Sismember { key, value } => format!("SISMEMBER {key} {value}"),
     };
     if let Some(response) = write_to_redis(client, message.as_bytes()).await.ok() {
         println!("{}", response);
